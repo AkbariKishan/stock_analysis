@@ -106,8 +106,9 @@ export default function Dashboard({ data }) {
                     <TrendingUp className="w-5 h-5 text-blue-500" />
                     Price History (30 Days)
                 </h3>
-                <div className="h-[300px] w-full -ml-4">
-                    <ResponsiveContainer width="100%" height="100%">
+                <div className="h-[300px] w-full bg-white/5 rounded-xl border border-white/10 p-2">
+                    <p className="text-xs text-gray-500 mb-2">Debug: {history?.length || 0} data points loaded</p>
+                    <ResponsiveContainer width="100%" height="90%">
                         <AreaChart data={history}>
                             <defs>
                                 <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
