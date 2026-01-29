@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 class LLMAnalysisService:
     @staticmethod
-    def analyze_market_data(symbol: str, market_data: Dict[str, Any], technicals: Dict[str, Any], sentiment: Dict[str, Any]) -> Dict[str, Any]:
+    def analyze_market_data(symbol: str, market_data: Dict[str, Any], technicals: Dict[str, Any], sentiment: Dict[str, Any], fundamentals: Dict[str, Any]) -> Dict[str, Any]:
         """
         Synthesize all market data into a cohesive analysis using Groq LLM.
         """
@@ -37,7 +37,10 @@ class LLMAnalysisService:
                 "top_headlines": [item["title"] for item in sentiment.get("news", [])[:5]]
             },
             "fundamentals": {
-                # Add fundamental data if available in the future
+                "pe_ratio": fundamentals.get("peRatio"),
+                "market_cap": fundamentals.get("marketCap"),
+                "sector": fundamentals.get("sector"),
+                "industry": fundamentals.get("industry")
             }
         }
 
@@ -48,12 +51,12 @@ class LLMAnalysisService:
         {json.dumps(context, indent=2)}
 
         INSTRUCTIONS:
-        1. Analyze the conflict or coherence between Technicals (RSI/MACD) and News Sentiment.
-        2. If RSI is Overbought (>70) but News is VERY Positive, it might still be a BUY (momentum).
-        3. If RSI is Oversold (<30) but News is Negative, it might be a "Catching a falling knife" (SELL).
+        1. Analyze the conflict or coherence between Technicals (RSI/MACD), News Sentiment, and Fundamentals.
+        2. Consider Valuation: If P/E ratio is extremely high (>100) or low (<10), factor this into the risk.
+        3. If RSI is Overbought but Fundamentals are rock solid and News is positive, it may still be a BUY.
         4. Provide a "score" from 0 (Strong Sell) to 100 (Strong Buy).
         5. Provide a specific "signal" (Strong Buy, Buy, Hold, Sell, Strong Sell).
-        6. Provide a concise 2-sentence summary explaining WHY.
+        6. Provide a concise 2-sentence summary explaining WHY, referencing specific metrics (e.g. "Despite high P/E...").
 
         OUTPUT FORMAT (JSON ONLY):
         {{

@@ -21,7 +21,11 @@ async def get_analysis(symbol: str):
     # 2. Tech Analysis
     tech_indicators = TechnicalAnalysisService.calculate_indicators(stock_data["history"])
 
-    analysis_result = LLMAnalysisService.analyze_market_data(symbol, stock_data, tech_indicators, sentiment_data)
+    # 3. Fundamentals
+    fundamentals = MarketDataService.get_company_info(symbol)
+    financial_history = MarketDataService.get_financials(symbol)
+
+    analysis_result = LLMAnalysisService.analyze_market_data(symbol, stock_data, tech_indicators, sentiment_data, fundamentals)
     
     # If LLM fails (missing key), fallback to basic logic would be implemented here or handled by the service returning specific structure
     score = analysis_result.get("score", 50)
@@ -37,5 +41,7 @@ async def get_analysis(symbol: str):
         },
         "technical_indicators": tech_indicators,
         "sentiment": sentiment_data,
+        "fundamentals": fundamentals,
+        "financial_history": financial_history,
         "history": stock_data["history"][-30:] # Last 30 days for chart
     }

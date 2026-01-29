@@ -2,6 +2,7 @@ import feedparser
 from textblob import TextBlob
 from typing import List, Dict, Any
 import ssl
+from .utils import sanitize_data
 
 # Fix for SSL certificate issues
 if hasattr(ssl, '_create_unverified_context'):
@@ -51,13 +52,13 @@ class SentimentAnalyzerService:
             avg_polarity = total_polarity / count if count > 0 else 0
             overall_sentiment = "Positive" if avg_polarity > 0.05 else "Negative" if avg_polarity < -0.05 else "Neutral"
             
-            return {
+            return sanitize_data({
                 "symbol": symbol,
                 "overall_sentiment": overall_sentiment,
                 "average_polarity": avg_polarity,
                 "news_count": count,
                 "news": news_items
-            }
+            })
             
         except Exception as e:
             return {"error": str(e)}

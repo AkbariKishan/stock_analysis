@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List
+from .utils import sanitize_data
 
 class TechnicalAnalysisService:
     @staticmethod
@@ -41,13 +42,13 @@ class TechnicalAnalysisService:
         # Get latest values
         latest = df.iloc[-1]
         
-        return {
-            "rsi": float(latest['RSI']) if not pd.isna(latest['RSI']) else None,
-            "macd": float(latest['MACD']) if not pd.isna(latest['MACD']) else None,
-            "macd_signal": float(latest['Signal_Line']) if not pd.isna(latest['Signal_Line']) else None,
-            "sma_50": float(latest['SMA_50']) if not pd.isna(latest['SMA_50']) else None,
-            "bb_upper": float(latest['BB_Upper']) if not pd.isna(latest['BB_Upper']) else None,
-            "bb_lower": float(latest['BB_Lower']) if not pd.isna(latest['BB_Lower']) else None,
-            "price": float(latest['Close']),
+        return sanitize_data({
+            "rsi": latest['RSI'],
+            "macd": latest['MACD'],
+            "macd_signal": latest['Signal_Line'],
+            "sma_50": latest['SMA_50'],
+            "bb_upper": latest['BB_Upper'],
+            "bb_lower": latest['BB_Lower'],
+            "price": latest['Close'],
             "trend": "Bullish" if latest['Close'] > latest['SMA_50'] else "Bearish"
-        }
+        })

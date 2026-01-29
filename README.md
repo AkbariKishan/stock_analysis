@@ -6,9 +6,12 @@
 
 ## 🚀 Key Features
 
-- **Agentic AI Analyst**: Uses **Llama 3 (via Groq)** to "reason" about the data, providing a nuanced Buy/Sell recommendation with a written summary.
-- **AI-Powered Sentiment**: Uses Natural Language Processing (NLP) to analyze real-time Google News headlines.
-- **Interactive Charts**: Responsive area charts visualizing 30-day price history.
+- **Agentic AI Analyst**: Uses **Llama 3.3 (via Groq)** to synthesize technical, sentiment, and fundamental data into a cohesive "Buy/Sell/Hold" signal.
+- **Deep Fundamental Analysis**: Evaluates company health using **P/E Ratio**, **Market Cap**, and **EPS** trends.
+- **AI-Powered Sentiment**: Real-time analysis of Google News headlines using NLP.
+- **Interactive Visualizations**: 
+    - **Price History**: 30-day area charts for technical trends.
+    - **Financial Performance**: Annual Bar charts comparing **Revenue vs. Net Income**.
 - **Live Market Data**: Real-time integration with Yahoo Finance.
 - **Premium UI**: Glassmorphism design system built with React & Tailwind CSS.
 
@@ -54,9 +57,10 @@ npm run dev
 
 | Indicator | Description |
 |-----------|-------------|
-| **RSI** | Relative Strength Index. <30 is Oversold (Bullish), >70 is Overbought (Bearish). |
-| **MACD** | Trend-following momentum indicator. Crossovers signal trend reversals. |
-| **Sentiment** | NLP scoring of recent news. Positive news boosts the prediction score. |
+| **RSI** | Relative Strength Index (<30: Oversold, >70: Overbought). |
+| **MACD** | Momentum indicator signaling trend reversals via crossovers. |
+| **Sentiment** | NLP scoring of recent news headlines (Positive/Negative/Neutral). |
+| **Fundamentals** | Valuation metrics (P/E, Market Cap) to assess long-term health. |
 
 ## 📜 License
 MIT

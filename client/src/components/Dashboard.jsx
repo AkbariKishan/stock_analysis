@@ -1,5 +1,5 @@
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
-import { TrendingUp, TrendingDown, ArrowRight, Activity, Newspaper } from 'lucide-react'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts'
+import { TrendingUp, TrendingDown, ArrowRight, Activity, Newspaper, Building2, Wallet } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const Card = ({ children, className = "" }) => (
@@ -47,7 +47,7 @@ const ScoreGauge = ({ score }) => {
 }
 
 export default function Dashboard({ data }) {
-    const { symbol, prediction, technical_indicators, sentiment, history } = data
+    const { symbol, prediction, technical_indicators, sentiment, history, fundamentals, financial_history } = data
 
     const isBullish = prediction.signal.includes('Buy')
     const trendColor = isBullish ? 'text-[#00f5d4]' : prediction.signal.includes('Sell') ? 'text-[#ff006e]' : 'text-yellow-400'
@@ -132,6 +132,60 @@ export default function Dashboard({ data }) {
                             />
                         </AreaChart>
                     </ResponsiveContainer>
+                </div>
+            </Card>
+
+            {/* Fundamentals Section */}
+            <Card className="lg:col-span-2 h-[400px] flex flex-col">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-purple-500" />
+                    Annual Financial Performance
+                </h3>
+                <div className="h-[300px] w-full bg-white/5 rounded-xl border border-white/10 p-2">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={financial_history}>
+                            <Tooltip
+                                contentStyle={{ backgroundColor: '#161822', borderColor: '#333' }}
+                                itemStyle={{ color: '#fff' }}
+                                formatter={(value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: "compact" }).format(value)}
+                            />
+                            <Legend />
+                            <XAxis dataKey="date" stroke="#9ca3af" />
+                            <YAxis hide />
+                            <Bar dataKey="revenue" name="Total Revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                            <Bar dataKey="net_income" name="Net Income" fill="#10b981" radius={[4, 4, 0, 0]} />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+            </Card>
+
+            {/* Fundamental Details */}
+            <Card>
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                    <Wallet className="w-5 h-5 text-green-500" />
+                    Key Fundamentals
+                </h3>
+                <div className="space-y-4">
+                    <div className="flex justify-between py-3 border-b border-white/5">
+                        <span className="text-gray-400">Market Cap</span>
+                        <span className="font-mono text-white">
+                            {fundamentals?.marketCap ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: "compact" }).format(fundamentals.marketCap) : 'N/A'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-white/5">
+                        <span className="text-gray-400">P/E Ratio</span>
+                        <span className={`font-mono ${fundamentals?.peRatio > 50 ? 'text-red-400' : 'text-green-400'}`}>
+                            {fundamentals?.peRatio?.toFixed(2) || 'N/A'}
+                        </span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-white/5">
+                        <span className="text-gray-400">EPS (TTM)</span>
+                        <span className="font-mono text-white">${fundamentals?.eps?.toFixed(2) || 'N/A'}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-b border-white/5">
+                        <span className="text-gray-400">Sector</span>
+                        <span className="font-mono text-sm text-gray-300 text-right">{fundamentals?.sector || 'N/A'}</span>
+                    </div>
                 </div>
             </Card>
 
