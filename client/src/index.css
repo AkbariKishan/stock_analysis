@@ -1,14 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --bg-primary: #0a0b14;
   --bg-secondary: #161822;
   --bg-tertiary: #23263a;
-  
-  --accent-primary: #3b82f6; /* Blue */
-  --accent-success: #00f5d4; /* Neo Green */
-  --accent-danger: #ff006e; /* Hot Pink */
-  
+
+  --accent-primary: #3b82f6;
+  /* Blue */
+  --accent-success: #00f5d4;
+  /* Neo Green */
+  --accent-danger: #ff006e;
+  /* Hot Pink */
+
   --text-primary: #ffffff;
   --text-secondary: #9ca3af;
   --text-scintilla: #e2e8f0;
@@ -53,9 +60,17 @@ body {
 
 /* Animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .animate-float {
@@ -66,15 +81,18 @@ body {
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--bg-primary); 
+  background: var(--bg-primary);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--bg-tertiary); 
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-primary); 
+  background: var(--accent-primary);
 }
 
 /* Input Styles */
