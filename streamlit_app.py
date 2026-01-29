@@ -175,25 +175,32 @@ if symbol:
                     
                     # News Section
                     st.write("### Recent News Analysis")
+                    if sentiment_data.get('reasoning'):
+                        st.info(f"**AI Sentiment Insight:** {sentiment_data['reasoning']}")
+                    
                     for news_item in sentiment_data.get('news', [])[:5]:
                         with st.expander(f"{news_item['title']}"):
                             st.write(f"**Published:** {news_item['published']}")
-                            sent_label = news_item['sentiment']['label']
-                            sent_class = "sentiment-pos" if sent_label == "Positive" else "sentiment-neg" if sent_label == "Negative" else "sentiment-neu"
-                            st.markdown(f"**Sentiment:** <span class='{sent_class}'>{sent_label}</span>", unsafe_allow_html=True)
-                            st.write(news_item.get('summary', 'No summary available.'))
                             st.link_button("Read Article", news_item['link'])
 
                 with col2:
                     # Metrics Grid
                     st.write("### Key Metrics")
-                    m_col1, m_col2 = st.columns(2)
+                    m_col1, m_col2, m_col3 = st.columns(3)
                     with m_col1:
                         st.metric("RSI (14)", f"{tech_indicators.get('rsi', 0):.1f}")
-                        st.metric("Market Cap", f"${fundamentals.get('marketCap', 0)/1e9:.1f}B")
+                        st.metric("P/E Ratio", f"{fundamentals.get('peRatio', 0):.1f}" if fundamentals.get('peRatio') else "N/A")
                     with m_col2:
                         st.metric("Sentiment", sentiment_data.get('overall_sentiment', 'Neutral').capitalize())
-                        st.metric("P/E Ratio", f"{fundamentals.get('peRatio', 0):.1f}")
+                        avg_pe = fundamentals.get('industry_pe_average', 0)
+                        pe_vs = fundamentals.get('pe_ratio_vs_industry', 'Fair')
+                        st.metric("Industry P/E", f"{avg_pe:.1f}", delta=pe_vs, delta_color="inverse" if pe_vs == "Overvalued" else "normal")
+                    with m_col3:
+                        st.metric("Beta", f"{fundamentals.get('beta', 0):.2f}" if fundamentals.get('beta') else "N/A")
+                        st.metric("Vol Strength", f"{tech_indicators.get('volume_strength', 1.0):.1f}x")
+                    
+                    if fundamentals.get('peers_used'):
+                        st.caption(f"**Industry Peers:** {', '.join(fundamentals['peers_used'])}")
                     
                     # Technical Data
                     st.write("### Technical Indicators")

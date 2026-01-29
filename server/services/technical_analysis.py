@@ -39,6 +39,11 @@ class TechnicalAnalysisService:
         df['BB_Upper'] = df['BB_Middle'] + (df['Close'].rolling(window=20).std() * 2)
         df['BB_Lower'] = df['BB_Middle'] - (df['Close'].rolling(window=20).std() * 2)
         
+        # 5. Volume Analysis
+        avg_vol = df['Volume'].rolling(window=20).mean()
+        latest_vol = df['Volume'].iloc[-1]
+        vol_strength = latest_vol / avg_vol.iloc[-1] if not avg_vol.empty and avg_vol.iloc[-1] > 0 else 1.0
+        
         # Get latest values
         latest = df.iloc[-1]
         
@@ -47,8 +52,11 @@ class TechnicalAnalysisService:
             "macd": latest['MACD'],
             "macd_signal": latest['Signal_Line'],
             "sma_50": latest['SMA_50'],
+            "sma_20": latest['SMA_20'],
             "bb_upper": latest['BB_Upper'],
             "bb_lower": latest['BB_Lower'],
             "price": latest['Close'],
+            "avg_volume": avg_vol.iloc[-1],
+            "volume_strength": vol_strength,
             "trend": "Bullish" if latest['Close'] > latest['SMA_50'] else "Bearish"
         })
