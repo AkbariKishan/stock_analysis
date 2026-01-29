@@ -13,44 +13,28 @@
     - **Price History**: 30-day area charts for technical trends.
     - **Financial Performance**: Annual Bar charts comparing **Revenue vs. Net Income**.
 - **Live Market Data**: Real-time integration with Yahoo Finance.
-- **Premium UI**: Glassmorphism design system built with React & Tailwind CSS.
+- **Premium UI**: Modern, interactive dashboard built with **Streamlit** and **Plotly**.
 
 ## 🛠 Tech Stack
 
-- **Backend**: Python, FastAPI, Pandas, TextBlob, yfinance, feedparser.
+- **Core Logic**: Python, Pandas, TextBlob, yfinance, feedparser.
 - **AI Engine**: **Groq API** running **Llama 3.3 70B**.
-- **Frontend**: React, Vite, Recharts, Framer Motion, Tailwind CSS.
+- **Frontend/UI**: Streamlit, Plotly.
 
 ## ⚡️ Quick Start
 
 ### Prerequisites
 - Python 3.8+
-- Node.js 16+
 - **Groq API Key** (Free from [console.groq.com](https://console.groq.com/keys))
 
 ### Configuration
 1. Open `.env` in the root directory.
 2. Add your key: `GROQ_API_KEY=gsk_...`
 
-### One-Command Start
-We've included a script to launch both the backend and frontend instantly:
+### Launch Analysis Dashboard
 
 ```bash
-./run.sh
-```
-
-### Manual Setup
-
-**Backend**
-```bash
-source venv/bin/activate
-uvicorn server.main:app --reload
-```
-
-**Frontend**
-```bash
-cd client
-npm run dev
+streamlit run streamlit_app.py
 ```
 
 ## 📊 Analysis Documentation

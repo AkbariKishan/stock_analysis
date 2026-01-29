@@ -16,10 +16,47 @@ class MarketDataService:
             if history.empty:
                 return {"error": f"No data found for symbol {symbol}"}
             
-            # Format data for frontend (list of dictionaries)
+            # 1. Handle MultiIndex (Slicing by Ticker)
+            if isinstance(history.columns, pd.MultiIndex):
+                try:
+                    # Prefer .xs to slice the ticker level
+                    history = history.xs(symbol, axis=1, level=1)
+                except:
+                    # Fallback: flatten columns
+                    history.columns = [col[0] for col in history.columns]
+            
+            # 2. Reset index to get Date as a column
             history.reset_index(inplace=True)
-            history['Date'] = history['Date'].dt.strftime('%Y-%m-%d')
-            data = history[['Date', 'Open', 'High', 'Low', 'Close', 'Volume']].to_dict('records')
+            
+            # 3. Ensure 'Date' is clean
+            date_col = next((c for c in history.columns if 'date' in str(c).lower()), None)
+            if date_col:
+                history.rename(columns={date_col: 'Date'}, inplace=True)
+            
+            # 4. Defensive extraction of core columns (High Fidelity)
+            data_map = {}
+            for col in ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']:
+                # Find matching column (case-insensitive)
+                found_col = next((c for c in history.columns if str(c).lower() == col.lower()), None)
+                if found_col:
+                    series = history[found_col]
+                    # If it's still a dataframe, pick the first column
+                    if isinstance(series, pd.DataFrame):
+                        series = series.iloc[:, 0]
+                    # Convert to JSON compliant types
+                    if col == 'Date':
+                        data_map[col] = pd.to_datetime(series).dt.strftime('%Y-%m-%d').tolist()
+                    elif col == 'Volume':
+                        data_map[col] = pd.to_numeric(series, errors='coerce').fillna(0).astype(int).tolist()
+                    else:
+                        data_map[col] = pd.to_numeric(series, errors='coerce').fillna(0).astype(float).tolist()
+                else:
+                    data_map[col] = [0] * len(history) if col != 'Date' else [""] * len(history)
+
+            # 5. Reconstruct as list of dicts
+            data = []
+            for i in range(len(history)):
+                data.append({k: data_map[k][i] for k in data_map})
             
             return sanitize_data({
                 "symbol": symbol,
@@ -65,21 +102,26 @@ class MarketDataService:
             if financials.empty:
                 return []
 
-            # Extract Revenue and Net Income
+            # Extract Revenue and Net Income (handle potential key variations)
             dates = [d.strftime('%Y') for d in financials.columns]
-            revenue = financials.loc['Total Revenue'].values.tolist() if 'Total Revenue' in financials.index else []
-            net_income = financials.loc['Net Income'].values.tolist() if 'Net Income' in financials.index else []
             
-            # Create list of dicts for Recharts
+            # Find the right key for Revenue and Net Income
+            rev_key = next((k for k in financials.index if k.lower() in ['total revenue', 'operating revenue', 'total_revenue']), None)
+            inc_key = next((k for k in financials.index if k.lower() in ['net income', 'net_income']), None)
+            
+            revenue = financials.loc[rev_key].values.tolist() if rev_key else [0] * len(dates)
+            net_income = financials.loc[inc_key].values.tolist() if inc_key else [0] * len(dates)
+            
+            # Create list of dicts
             data = []
             for i in range(len(dates)):
                 data.append({
                     "date": dates[i],
-                    "revenue": revenue[i] if i < len(revenue) else 0,
-                    "net_income": net_income[i] if i < len(net_income) else 0
+                    "revenue": float(revenue[i]) if i < len(revenue) and pd.notnull(revenue[i]) else 0,
+                    "net_income": float(net_income[i]) if i < len(net_income) and pd.notnull(net_income[i]) else 0
                 })
             
-            # Sort by date ascending
+            # Sort by date ascending (chronological)
             data.sort(key=lambda x: x["date"])
             
             return sanitize_data(data)

@@ -10,4 +10,5 @@ python-dotenv
 httpx
 feedparser
 groq
-
+streamlit
+plotly
