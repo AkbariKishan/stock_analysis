@@ -6,7 +6,7 @@
 
 ## 🚀 Key Features
 
-- **Smart Prediction Engine**: Aggregates multiple data points into a clear 0-100 Buy/Sell score.
+- **Agentic AI Analyst**: Uses **Llama 3 (via Groq)** to "reason" about the data, providing a nuanced Buy/Sell recommendation with a written summary.
 - **AI-Powered Sentiment**: Uses Natural Language Processing (NLP) to analyze real-time Google News headlines.
 - **Interactive Charts**: Responsive area charts visualizing 30-day price history.
 - **Live Market Data**: Real-time integration with Yahoo Finance.
@@ -15,6 +15,7 @@
 ## 🛠 Tech Stack
 
 - **Backend**: Python, FastAPI, Pandas, TextBlob, yfinance, feedparser.
+- **AI Engine**: **Groq API** running **Llama 3.3 70B**.
 - **Frontend**: React, Vite, Recharts, Framer Motion, Tailwind CSS.
 
 ## ⚡️ Quick Start
@@ -22,6 +23,11 @@
 ### Prerequisites
 - Python 3.8+
 - Node.js 16+
+- **Groq API Key** (Free from [console.groq.com](https://console.groq.com/keys))
+
+### Configuration
+1. Open `.env` in the root directory.
+2. Add your key: `GROQ_API_KEY=gsk_...`
 
 ### One-Command Start
 We've included a script to launch both the backend and frontend instantly:

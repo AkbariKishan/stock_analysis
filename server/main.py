@@ -1,6 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import stock, sentiment, analysis
+from dotenv import load_dotenv, find_dotenv
+import os
+
+# Explicitly find and load .env from project root
+# This fixes issue where uvicorn running from different cwd fails to find .env
+load_dotenv(find_dotenv())
 
 app = FastAPI(title="Stock Analysis API")
 
