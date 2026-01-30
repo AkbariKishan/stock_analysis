@@ -87,12 +87,18 @@ class LLMAnalysisService:
         - Factor in sector/industry context (e.g., tech often has higher P/Es than utilities).
         - If industry_pe_average or other fundamentals are missing/incomplete, note this and de-emphasize valuation signals.
 
-        4. Resolving Conflicts
+        4. 5-Day Price Projection
+        - Based on current trends, valuation, and sentiment, estimate the daily closing price for the next 5 business days.
+        - Be realistic and factor in volatility (beta).
+        - If technicals are extremely overbought and sentiment is cooling, project a pullback.
+        - If fundamentals are strong and price is recovering, project an uptrend.
+
+        5. Resolving Conflicts
         - If RSI is overbought but fundamentals are strong (e.g., pe_ratio << industry_pe_average) and sentiment is clearly positive, a BUY can still be justified, but note the near‑term technical risk.
         - If signals strongly disagree (e.g., very negative sentiment but strong relative valuation), explain which dimension you prioritize and why (short‑term vs long‑term view).
         - If most signals are weak, noisy, or contradictory, prefer HOLD.
 
-        5. Scoring & Signals
+        6. Scoring & Signals
         - Assign a numeric "score" from 0 to 100:
             0-20  = Strong Sell
             21-40 = Sell
@@ -100,12 +106,10 @@ class LLMAnalysisService:
             61-80 = Buy
             81-100 = Strong Buy
         - Ensure "signal" is consistent with the score bands above.
-        - If data quality is poor or highly incomplete (esp. missing industry_pe_average), keep the score closer to 50 and explain the uncertainty.
 
-        6. Summary
+        7. Summary
         - Provide a concise summary of at most 2 sentences.
         - Explicitly reference key metrics driving the decision (e.g., "RSI=75 (overbought), pe_ratio=18 vs industry_pe_average=25 (undervalued), sentiment.score=0.4").
-        - Avoid generic language like "overall it looks good"; be specific and metric-driven.
 
         OUTPUT REQUIREMENTS (STRICT JSON ONLY):
         - Return a single JSON object.
@@ -115,7 +119,11 @@ class LLMAnalysisService:
         {{
         "score": <integer between 0 and 100>,
         "signal": "<one of: 'Strong Buy', 'Buy', 'Hold', 'Sell', 'Strong Sell'>",
-        "summary": "<string, max 2 sentences, referencing specific metrics>"
+        "summary": "<string, max 2 sentences, referencing specific metrics>",
+        "projection": {{
+            "prices": [<float for day 1>, <float for day 2>, <float for day 3>, <float for day 4>, <float for day 5>],
+            "reasoning": "<1-sentence logic for the projected price movement>"
+        }}
         }}
 
         Now produce the JSON output only.
@@ -130,7 +138,7 @@ class LLMAnalysisService:
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.2,
-                max_tokens=200,
+                max_tokens=500,
                 response_format={"type": "json_object"}
             )
             

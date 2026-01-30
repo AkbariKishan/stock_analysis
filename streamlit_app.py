@@ -52,7 +52,18 @@ st.markdown("""
 # Sidebar
 st.sidebar.title("📈 StockMind AI")
 symbol = st.sidebar.text_input("Enter Ticker Symbol", value="NVDA").upper()
-period = st.sidebar.selectbox("Period", ["1mo", "3mo", "6mo", "1y", "2y", "5y"], index=3)
+
+# Period & Interval selection
+col_p, col_i = st.sidebar.columns(2)
+with col_p:
+    period = st.selectbox("Period", ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y"], index=5)
+with col_i:
+    interval = st.selectbox("Interval", ["1m", "5m", "15m", "1h", "1d"], index=4)
+
+# 1m interval safety check (yfinance limit)
+if interval == "1m" and period not in ["1d", "5d", "7d"]:
+    st.sidebar.warning("1m interval is limited to max 7 days. Switching period to 5d.")
+    period = "5d"
 
 st.sidebar.markdown("---")
 st.sidebar.info("""
@@ -63,7 +74,7 @@ if symbol:
     with st.spinner(f"Analyzing {symbol}..."):
         try:
             # 1. Fetch Data
-            stock_data = MarketDataService.get_stock_history(symbol, period=period)
+            stock_data = MarketDataService.get_stock_history(symbol, period=period, interval=interval)
             if "error" in stock_data:
                 st.error(f"Error fetching data for {symbol}: {stock_data['error']}")
             else:
@@ -109,7 +120,12 @@ if symbol:
                     
                     # Ensure data is strictly numeric, sorted, and converted to PURE LISTS
                     history_df = history_df.sort_values('Date').reset_index(drop=True)
-                    plot_dates = history_df['Date'].dt.strftime('%Y-%m-%d').tolist()
+                    
+                    # Formatting for X-axis
+                    is_intraday = interval in ['1m', '5m', '15m', '1h']
+                    date_format = '%Y-%m-%d %H:%M' if is_intraday else '%Y-%m-%d'
+                    plot_dates = history_df['Date'].dt.strftime(date_format).tolist()
+                    
                     plot_close = pd.to_numeric(history_df['Close'], errors='coerce').tolist()
                     plot_volume = pd.to_numeric(history_df['Volume'], errors='coerce').tolist()
                     
@@ -166,12 +182,63 @@ if symbol:
                     )
                     st.plotly_chart(fig, use_container_width=True)
                     
+                    # Price Projection Section
+                    if "projection" in analysis_result:
+                        st.write("### AI Price Projection (Next 5 Days)")
+                        proj_data = analysis_result["projection"]
+                        proj_prices = proj_data.get("prices", [])
+                        proj_reasoning = proj_data.get("reasoning", "")
+                        
+                        if proj_prices and len(proj_prices) == 5:
+                            # Calculate next 5 business days
+                            future_dates = []
+                            current_dt = datetime.now()
+                            while len(future_dates) < 5:
+                                current_dt += timedelta(days=1)
+                                if current_dt.weekday() < 5:  # Monday to Friday
+                                    future_dates.append(current_dt.strftime('%Y-%m-%d'))
+                            
+                            fig_proj = go.Figure()
+                            
+                            # Add projection line
+                            fig_proj.add_trace(go.Scatter(
+                                x=future_dates,
+                                y=proj_prices,
+                                mode='lines+markers+text',
+                                name='Projected Price',
+                                text=[f"${p:.2f}" for p in proj_prices],
+                                textposition="top center",
+                                line=dict(color='#fbbf24', width=3, dash='dash'),
+                                marker=dict(size=10, color='#fbbf24')
+                            ))
+                            
+                            fig_proj.update_layout(
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                margin=dict(l=0, r=0, t=30, b=0),
+                                height=300,
+                                xaxis=dict(showgrid=False),
+                                yaxis=dict(
+                                    showgrid=True, 
+                                    gridcolor='rgba(255,255,255,0.1)',
+                                    range=[min(proj_prices) * 0.98, max(proj_prices) * 1.02]
+                                ),
+                                showlegend=False
+                            )
+                            st.plotly_chart(fig_proj, use_container_width=True)
+                            st.info(f"**Projection Logic:** {proj_reasoning}")
+                        else:
+                            st.warning("AI Price Projection data is incomplete.")
+
                     # Debug Info
                     with st.expander("🛠 Debug: Raw Market Data"):
                         st.write("**Data Types:**")
                         st.write(history_df.dtypes.to_dict())
                         st.write("**Last 5 Rows:**")
                         st.dataframe(history_df.tail())
+                        if "projection" in analysis_result:
+                            st.write("**Raw Projection:**")
+                            st.json(analysis_result["projection"])
                     
                     # News Section
                     st.write("### Recent News Analysis")

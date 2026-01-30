@@ -40,6 +40,10 @@ class MarketDataService:
             
             # 4. Defensive extraction of core columns (High Fidelity)
             data_map = {}
+            # Determine if we should include time (intra-day)
+            is_intraday = interval in ['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h']
+            date_format = '%Y-%m-%d %H:%M:%S' if is_intraday else '%Y-%m-%d'
+
             for col in ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']:
                 # Find matching column (case-insensitive)
                 found_col = next((c for c in history.columns if str(c).lower() == col.lower()), None)
@@ -50,7 +54,7 @@ class MarketDataService:
                         series = series.iloc[:, 0]
                     # Convert to JSON compliant types
                     if col == 'Date':
-                        data_map[col] = pd.to_datetime(series).dt.strftime('%Y-%m-%d').tolist()
+                        data_map[col] = pd.to_datetime(series).dt.strftime(date_format).tolist()
                     elif col == 'Volume':
                         data_map[col] = pd.to_numeric(series, errors='coerce').fillna(0).astype(int).tolist()
                     else:
