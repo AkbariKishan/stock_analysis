@@ -48,6 +48,23 @@
 - **Core Logic**: Python, Pandas, TextBlob, yfinance, feedparser.
 - **AI Engine**: **Groq API** running **Llama 3.3 70B**.
 - **Frontend/UI**: Streamlit, Plotly.
+- **MCP Server**: Model Context Protocol for AI assistant integration.
+
+## 🔌 MCP Server (AI Assistant Integration)
+
+StockMind AI is available as an **MCP server**, allowing AI assistants like Claude Desktop to access stock analysis capabilities directly.
+
+> **✅ NO API KEY REQUIRED!** The MCP server provides raw market data that your AI client's LLM interprets.
+
+**Features**:
+- Analyze any stock via natural language
+- Compare multiple stocks side-by-side
+- Get comprehensive technical, fundamental, and sentiment data
+- Works with Claude, ChatGPT, or any MCP-compatible AI
+
+**Setup**: See [MCP_README.md](MCP_README.md) for 2-minute setup instructions.
+
+**How it works**: Server fetches market data → Your AI's LLM analyzes it → You get investment recommendations
 
 ## ⚡️ Quick Start
 

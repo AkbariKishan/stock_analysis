@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "stockmind": {
+      "command": "python",
+      "args": [
+        "/Users/snehakotai/stock_analysis/mcp_server.py"
+      ]
+    }
+  }
+}

@@ -12,3 +12,4 @@ feedparser
 groq
 streamlit
 plotly
+mcp>=0.9.0
