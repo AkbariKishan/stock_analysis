@@ -12,11 +12,13 @@ Or install all dependencies:
 pip install -r server/requirements.txt
 ```
 
-2. **Verify Environment**:
-Ensure your `.env` file contains:
+2. **Verify Environment** (Optional):
+If you plan to use the Streamlit UI as well, ensure your `.env` file contains:
 ```
 GROQ_API_KEY=gsk_your_key_here
 ```
+
+**Note**: The MCP server does NOT require a Groq API key. It uses your AI client's LLM.
 
 ## Running the MCP Server
 
@@ -32,7 +34,7 @@ npx @modelcontextprotocol/inspector python mcp_server.py
 
 ## Connecting to Claude Desktop
 
-> **IMPORTANT**: You must use your own Groq API key. Get a free key at [console.groq.com](https://console.groq.com/keys)
+> **✅ NO API KEY REQUIRED!** The MCP server uses your AI client's LLM for analysis.
 
 1. **Locate Claude Desktop config**:
    - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -44,16 +46,13 @@ npx @modelcontextprotocol/inspector python mcp_server.py
   "mcpServers": {
     "stockmind": {
       "command": "python",
-      "args": ["/Users/snehakotai/stock_analysis/mcp_server.py"],
-      "env": {
-        "GROQ_API_KEY": "YOUR_OWN_GROQ_API_KEY_HERE"
-      }
+      "args": ["/absolute/path/to/stock_analysis/mcp_server.py"]
     }
   }
 }
 ```
 
-**Note**: Replace `YOUR_OWN_GROQ_API_KEY_HERE` with your personal Groq API key (starts with `gsk_`). Do NOT share this key publicly.
+**Note**: Replace `/absolute/path/to/stock_analysis/mcp_server.py` with the actual absolute path on your system.
 
 3. **Restart Claude Desktop**
 
@@ -61,43 +60,33 @@ npx @modelcontextprotocol/inspector python mcp_server.py
 
 ## Available Resources
 
-- `stock://screener/sp100` - S&P 100 screener results (top 10)
-- `stock://analysis/AAPL` - Full analysis for Apple
-- `stock://projection/TSLA` - 5-day projection for Tesla
-- `stock://market-data/NVDA` - Market data for NVIDIA
+- `stock://analysis/AAPL` - Complete analysis data for Apple
+- `stock://market-data/NVDA` - Historical market data for NVIDIA
 
 ## Available Tools
 
 ### analyze_stock
-Analyze a single stock with AI.
+Get comprehensive stock analysis data (technical, fundamental, sentiment).
 
 **Example**:
 ```
 Analyze AAPL stock
 ```
 
-### screen_sp100
-Run S&P 100 screener.
-
-**Example**:
-```
-Show me the top 10 stocks from S&P 100
-```
-
-### get_price_projection
-Get 5-day price forecast.
-
-**Example**:
-```
-What's the 5-day price projection for TSLA?
-```
-
 ### compare_stocks
-Compare multiple stocks.
+Compare multiple stocks side-by-side.
 
 **Example**:
 ```
 Compare AAPL, MSFT, and GOOGL
+```
+
+### get_market_data
+Get raw historical price and volume data.
+
+**Example**:
+```
+Get market data for TSLA over the past 6 months
 ```
 
 ## Troubleshooting
@@ -105,14 +94,13 @@ Compare AAPL, MSFT, and GOOGL
 ### Server won't start
 - Check Python version (3.8+ required)
 - Verify all dependencies installed: `pip install -r server/requirements.txt`
-- Ensure GROQ_API_KEY is set in environment
 
 ### Claude Desktop can't connect
 - Verify absolute path in config is correct
 - Check Claude Desktop logs
 - Restart Claude Desktop after config changes
 
-### Rate limiting errors
-- S&P 100 screener uses caching (1 hour TTL)
-- Individual stock analyses are not cached by default
-- Groq free tier: 30 requests/minute, 14,400/day
+### Data seems outdated
+- Yahoo Finance data updates during market hours
+- Historical data is always available
+- News sentiment refreshes with each request
