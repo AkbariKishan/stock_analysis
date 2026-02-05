@@ -84,24 +84,23 @@ def analyze_stock_data(symbol: str, period: str = "3mo", interval: str = "1d") -
             "52_week_high": high_52,
             "52_week_low": low_52
         },
-        "sentiment": {
-            "overall": sentiment_data.get("overall_sentiment"),
-            "score": sentiment_data.get("average_polarity"),
+        "sentiment_analysis": {
             "news_count": sentiment_data.get("news_count"),
-            "top_headlines": [item["title"] for item in sentiment_data.get("news", [])[:5]],
-            "reasoning": sentiment_data.get("reasoning", "")
+            "headlines": [item["title"] for item in sentiment_data.get("news", [])],
+            "instruction": "Analyze the headlines above to determine current market sentiment and mood for this stock."
         },
         "analysis_prompt": f"""
-Based on the above data for {symbol}, provide:
-1. Investment Score (0-100): 0-20=Strong Sell, 21-40=Sell, 41-60=Hold, 61-80=Buy, 81-100=Strong Buy
-2. Signal: Strong Buy/Buy/Hold/Sell/Strong Sell
-3. Summary: 2-sentence analysis referencing specific metrics
-4. 5-Day Price Projection: Estimate daily closing prices for next 5 business days with reasoning
+Based on the provided market data and news for {symbol}, provide:
+1. Sentiment Analysis: Evaluate the news headlines to determine market mood (Positive/Negative/Neutral)
+2. Investment Score (0-100): 0-20=Strong Sell, 21-40=Sell, 41-60=Hold, 61-80=Buy, 81-100=Strong Buy
+3. Signal: Strong Buy/Buy/Hold/Sell/Strong Sell
+4. Summary: 2-sentence analysis referencing specific metrics and news sentiment
+5. 5-Day Price Projection: Estimate daily closing prices for next 5 business days with reasoning
 
 Consider:
 - Technicals: RSI overbought/oversold, MACD momentum, trend direction
 - Fundamentals: P/E vs industry average (undervalued if <80%, overvalued if >120%)
-- Sentiment: News polarity and market mood
+- Sentiment: Your analysis of the provided news headlines
 - Risk: Beta for volatility assessment
         """
     }

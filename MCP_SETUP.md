@@ -12,14 +12,6 @@ Or install all dependencies:
 pip install -r server/requirements.txt
 ```
 
-2. **Verify Environment** (Optional):
-If you plan to use the Streamlit UI as well, ensure your `.env` file contains:
-```
-GROQ_API_KEY=gsk_your_key_here
-```
-
-**Note**: The MCP server does NOT require a Groq API key. It uses your AI client's LLM.
-
 ## Running the MCP Server
 
 ### Standalone Mode
